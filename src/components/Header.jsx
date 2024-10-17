@@ -1,24 +1,35 @@
-import { Typography, Box, useTheme } from "@mui/material";
-import { tokens } from "../theme";
+import React, { useEffect, useState } from 'react'
+import {BASE_URL} from '../api/api'
+import { aboutMe } from '../api/authApi'
+export default function Header() {
+  const [username, setUsername] = useState("");
+  const [role, setRole] = useState("");
+  const [profile, setProfile] = useState("");
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await aboutMe();
+      if (data && data.user) {
+        setUsername(data.user.username);
+        setRole(data.user.role);
+        setProfile(BASE_URL + "/" + data.user.image_profile);
+      }
+    };
 
-const Header = ({ title, subtitle }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+    const loadData = async () => {
+      await fetchUserData();
+    };
+
+    loadData();
+  }, []);
   return (
-    <Box mb="30px">
-      <Typography
-        variant="h2"
-        color={colors.grey[100]}
-        fontWeight="bold"
-        sx={{ m: "0 0 5px 0" }}
-      >
-        {title}
-      </Typography>
-      <Typography variant="h5" color={colors.greenAccent[400]}>
-        {subtitle}
-      </Typography>
-    </Box>
-  );
-};
-
-export default Header;
+    <div className='bg-white h-16 px-4 flex justify-between items-center border-b border-gray-200'>
+        <div>
+            <h1>Dashboard</h1>
+        </div>
+        <div className='flex items-center gap-2 mr-2'>
+        <p>{username}</p>
+        <img src="{profile}" alt="" />
+        </div>
+    </div>
+  )
+}

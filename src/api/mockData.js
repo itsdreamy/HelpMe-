@@ -1,4 +1,3 @@
-import { tokens } from "../theme";
 import axios from "axios";
 import { API_URL } from "./api";
 
