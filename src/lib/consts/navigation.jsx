@@ -1,13 +1,12 @@
 import {
 	HiOutlineViewGrid,
-	HiOutlineCube,
-	HiOutlineShoppingCart,
 	HiOutlineUsers,
-	HiOutlineDocumentText,
-	HiOutlineAnnotation,
-	HiOutlineQuestionMarkCircle,
-	HiOutlineCog
-} from 'react-icons/hi'
+	HiOutlineLogout
+} from 'react-icons/hi';
+import { AiOutlineShop } from "react-icons/ai";
+import { RiUserLocationLine } from "react-icons/ri";
+import { TbHelpOctagon } from "react-icons/tb";
+import { useState } from 'react';
 
 export const DASHBOARD_SIDEBAR_LINKS = [
 	{
@@ -15,38 +14,39 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		label: 'Dashboard',
 		path: '/dashboard',
 		icon: <HiOutlineViewGrid />
-	},
+	}
+];
+
+export const DASHBOARD_USAHA = [
 	{
 		key: 'usaha',
 		label: 'Usaha Mitra',
 		path: '/usaha',
-		icon: <HiOutlineCube />
-	},
+		icon: <AiOutlineShop />
+	}
+];
+
+export const DASHBOARD_USERS = [
 	{
 		key: 'mitra',
 		label: 'Kelola Mitra',
-		path: '/mitra',
-		icon: <HiOutlineShoppingCart />
+		path: '/kelolamitra',
+		icon: <RiUserLocationLine />
 	},
 	{
 		key: 'client',
 		label: 'Kelola Clients',
-		path: '/client',
+		path: '/kelolaclient',
 		icon: <HiOutlineUsers />
 	}
-]
+];
 
-export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
+export const DASHBOARD_BANTUAN = [
 	{
-		key: 'settings',
-		label: 'Settings',
-		path: '/settings',
-		icon: <HiOutlineCog />
+		key: 'bantuan',
+		label: 'Kelola Bantuan',
+		path: '/kelolabantuan',
+		icon: <TbHelpOctagon />
 	},
-	{
-		key: 'support',
-		label: 'Help & Support',
-		path: '/support',
-		icon: <HiOutlineQuestionMarkCircle />
-	}
-]
+];
+

@@ -1,9 +1,9 @@
-import { ResponsiveBar } from "@nivo/bar";
-import { CircularProgress } from "@mui/material";
-import { fetchUserStatsByGranularity } from "../../api/mockData";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Legend } from 'recharts';
+import { CircularProgress } from '@mui/material'; // Import from MUI
+import { fetchUserStatsByGranularity } from '../../api/mockData'; // Update this path as necessary
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChartUsers = () => {
   const [data, setData] = useState([]);
   const [granularity, setGranularity] = useState("yearly");
   const [year, setYear] = useState("");
@@ -16,21 +16,14 @@ const BarChart = ({ isDashboard = false }) => {
       setIsLoading(true);
       let response = null;
 
-      // Fetch data based on granularity
       if (granularity === "monthly" && year) {
         response = await fetchUserStatsByGranularity(granularity, year);
       } else if (granularity === "yearly" && startYear && endYear) {
-        response = await fetchUserStatsByGranularity(
-          granularity,
-          null,
-          startYear,
-          endYear
-        );
+        response = await fetchUserStatsByGranularity(granularity, null, startYear, endYear);
       }
 
       if (response && response.data) {
         setData(response.data);
-        console.log(response);
       }
       setIsLoading(false);
     };
@@ -39,163 +32,81 @@ const BarChart = ({ isDashboard = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Data fetching is handled by useEffect
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="form-filter">
-        <label className="label-filter">
-          Granularity:
+    <div className="p-4">
+      <form onSubmit={handleSubmit} className="mb-3 flex items-center space-x-4 bg-gray-50 p-2 rounded-lg">
+        <div className="flex items-center">
+          <label className="text-sm font-medium text-gray-700 mr-2">Granularity:</label>
           <select
-            className="input-filter"
+            className="p-1 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             value={granularity}
             onChange={(e) => setGranularity(e.target.value)}
           >
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
           </select>
-        </label>
+        </div>
 
         {granularity === "monthly" && (
-          <label className="label-filter">
-            Year:
+          <div className="flex items-center">
+            <label className="text-sm font-medium text-gray-700 mr-2">Year:</label>
             <input
-              className="input-filter"
+              className="p-1 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              placeholder="Enter year"
+              placeholder="Year"
             />
-          </label>
+          </div>
         )}
 
         {granularity === "yearly" && (
           <>
-            <label className="label-filter">
-              Start Year:
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 mr-2">Start Year:</label>
               <input
-                className="input-filter"
+                className="p-1 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                 type="number"
                 value={startYear}
                 onChange={(e) => setStartYear(e.target.value)}
-                placeholder="Enter start year"
+                placeholder="Start Year"
               />
-            </label>
-            <label className="label-filter">
-              End Year:
+            </div>
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 mr-2">End Year:</label>
               <input
-                className="input-filter"
+                className="p-1 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                 type="number"
                 value={endYear}
                 onChange={(e) => setEndYear(e.target.value)}
-                placeholder="Enter end year"
+                placeholder="End Year"
               />
-            </label>
+            </div>
           </>
         )}
       </form>
+
       {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '120px' }}>
-          <CircularProgress sx={{ 
-            color: "#fff"
-           }} />
+        <div className="flex justify-center mt-10">
+          <CircularProgress />
         </div>
       ) : (
-        <ResponsiveBar
-          data={data}
-          keys={["count"]}
-          indexBy="period"
-          margin={{ top: 53, right: 130, bottom: 67.5, left: 100 }}
-          padding={0.3}
-          valueScale={{ type: "linear" }}
-          indexScale={{ type: "band", round: true }}
-          colors={{ scheme: "nivo" }}
-          borderColor={{
-            from: "color",
-            modifiers: [["darker", "1.6"]],
-          }}
-          axisTop={null}
-          axisRight={null}
-          axisBottom={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 45,
-            legend: isDashboard ? undefined : "Period",
-            legendPosition: "middle",
-            legendOffset: 32,
-            format: (d) => {
-              if (typeof d === "string") {
-                return d.substring(0, 3);
-              }
-              return d;
-            },
-          }}
-          axisLeft={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: isDashboard ? undefined : "Count",
-            legendPosition: "middle",
-            legendOffset: -40,
-          }}
-          enableLabel={false}
-          legends={[
-            {
-              dataFrom: "keys",
-              anchor: "bottom-right",
-              direction: "column",
-              itemsSpacing: 2,
-              itemWidth: 100,
-              itemHeight: 20,
-              itemTextColor: "#fff",
-              symbolSize: 20,
-              justify: false,
-              translateX: 0,
-              translateY: 56,
-              itemDirection: "left-to-right",
-              itemOpacity: 1,
-              symbolShape: "circle",
-            },
-          ]}
-          role="application"
-          barAriaLabel={(e) =>
-            `${e.id}: ${e.formattedValue} in period: ${e.indexValue}`
-          }
-          
-          // Add custom tooltip
-          tooltip={({ id, value, indexValue }) => (
-            <div
-              style={{
-                padding: "12px",
-                background: "#333",
-                color: "#fff",
-                borderRadius: "4px",
-              }}
-            >
-              <strong>{indexValue}</strong>: {value} {id}
-            </div>
-          )}
-          
-          theme={{
-            axis: {
-              ticks: {
-                text: {
-                  fill: "#ffffff",
-                },
-              },
-            },
-            legends: {
-              text: {
-                fill: "#ffffff",
-              },
-            },
-          }}
-        />
-        
+        <ResponsiveContainer width="100%" height={230}> {/* Reduce height here */}
+          <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: -3 }}> {/* Adjust margins */}
+            <XAxis dataKey="period" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="count" fill="#B5C18E">
+              <LabelList dataKey="count" position="top" />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       )}
-    </>
+    </div>
   );
 };
 
-export default BarChart;
+export default BarChartUsers;

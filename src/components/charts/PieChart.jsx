@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { ResponsivePie } from "@nivo/pie";
+import React, { useEffect, useState } from "react";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { CircularProgress } from "@mui/material";
 import { fetchClientAndMitraStats } from "../../api/mockData";
 
-const PieChart = () => {
+const PieChartDiff = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -14,16 +14,14 @@ const PieChart = () => {
       if (stats) {
         setData([
           {
-            id: "Client",
-            label: "Client",
+            name: "Client",
             value: stats.client_count,
-            color: "white",
+            color: "#543310", // Client color
           },
           {
-            id: "Mitra",
-            label: "Mitra",
+            name: "Mitra",
             value: stats.mitra_count,
-            color: "hsl(162, 70%, 50%)",
+            color: "#AF8F6F", // Mitra color
           },
         ]);
       }
@@ -33,51 +31,40 @@ const PieChart = () => {
   }, []);
 
   return (
-    <>
+    <div className="flex justify-center items-center m-0 p-0"> {/* Adjust margin and padding */}
       {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '100px' }}>
-          <CircularProgress sx={{ color: "#fff" }} />
+        <div className="flex justify-center">
+          <CircularProgress />
         </div>
       ) : (
-        <ResponsivePie
-          data={data}
-          margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-          innerRadius={0.5}
-          padAngle={0.7}
-          cornerRadius={3}
-          activeOuterRadiusOffset={8}
-          borderColor={{
-            from: "color",
-            modifiers: [["darker", 0.2]],
-          }}
-          arcLinkLabelsSkipAngle={10}
-          arcLinkLabelsTextColor="#fff"
-          arcLinkLabelsThickness={2}
-          arcLinkLabelsColor={{ from: "color" }}
-          arcLinkLabel={d => `${d.value}`} // Show the count as arc link labels
-          enableArcLabels={false}  // Disable labels inside the pie
-          tooltip={() => null}
-          legends={[
-            {
-              anchor: "bottom",
-              direction: "row",
-              justify: false,
-              translateX: 0,
-              translateY: 56,
-              itemsSpacing: 0,
-              itemWidth: 100,
-              itemHeight: 18,
-              itemTextColor: "#fff",
-              itemDirection: "left-to-right",
-              itemOpacity: 1,
-              symbolSize: 18,
-              symbolShape: "circle",
-            },
-          ]}
-        />
+        <PieChart width={400} height={400} margin={{ top: -65, right: 0, left: 0, bottom: 0 }}> {/* Ensure no margin on PieChart */}
+          <Pie
+            data={data}
+            cx={200} // Center x
+            cy={200} // Center y
+            innerRadius={60} // Inner radius for a donut chart
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+            nameKey="name"
+            labelLine={false}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} // Show percentage label
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend
+            verticalAlign="bottom"
+            height={30}
+            iconType="circle"
+            wrapperStyle={{ marginBottom: "70px", color: '#fff' }} // Adjust padding as needed
+          />
+        </PieChart>
       )}
-    </>
+    </div>
   );
 };
 
-export default PieChart;
+export default PieChartDiff;

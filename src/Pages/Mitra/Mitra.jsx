@@ -1,48 +1,131 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
+import { mockDataUsers } from '../../api/mockData'; // API hook for delete action
+import Preloader from "../../components/Preloader"; // Preloader component
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 export default function Mitra() {
-  useEffect(() => {
-    // Initialize DataTable when component mounts
-    $(document).ready(function () {
-      $('#usahaTable').DataTable();
-    });
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch Data from API
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await mockDataUsers('mitra');
+      if (response && response.data) {
+        const numberedData = response.data.map((item, index) => ({
+          ...item,
+          no: index + 1,
+        }));
+        setData(numberedData);
+      } else {
+        console.error("No data found");
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Example data for the DataTable
-  const data = [
-    { id: 1, name: 'Business 1', type: 'Retail', location: 'City A' },
-    { id: 2, name: 'Business 2', type: 'Service', location: 'City B' },
-    { id: 3, name: 'Business 3', type: 'Manufacturing', location: 'City C' },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (!loading) {
+      // Destroy the previous DataTable instance if it exists
+      if ($.fn.dataTable.isDataTable('#Mitra')) {
+        $('#Mitra').DataTable().destroy();
+      }
+
+      $('#Mitra').DataTable({
+        data: data,
+        columns: [
+          { title: "No", data: "no" },
+          { title: "User ID", data: "id" },
+          { title: "Identifier", data: "identifier" },
+          { title: "Name", data: "full_name" },
+          { title: "Nomor Telepon", data: "phone_number" },
+          { title: "Username", data: "username" },
+          { title: "Role", data: "role" },
+          {
+            title: "Is Active",
+            data: "is_active",
+            render: (data, type, row) => {
+              return row.is_active ? "Active" : "Inactive";
+            },
+          },
+          {
+            title: "Actions",
+            data: null,
+            render: (data, type, row) => {
+              return (
+                <button
+                  onClick={() => handleSubmit(row.id)} // Call handleSubmit with user id
+                  style={{
+                    backgroundColor: row.is_active ? "red" : "green",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {row.is_active ? "Ban" : "Unban"}
+                </button>
+              );
+            },
+          },
+        ],
+        paging: true,
+        searching: true,
+        ordering: true,
+        responsive: true,
+        destroy: true, // Allow the DataTable to be reinitialized
+      });
+    }
+  }, [loading, data]);
+
+  const handleSubmit = async (id) => {
+    // Implement your ban/unban logic here
+    console.log("Toggle user status for ID:", id);
+  };
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Mitra</h2>
-      <div className="overflow-x-auto">
-        <table id="usahaTable" className="min-w-full table-auto display compact stripe hover">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-4 py-2">ID</th>
-              <th className="px-4 py-2">Business Name</th>
-              <th className="px-4 py-2">Type</th>
-              <th className="px-4 py-2">Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((business) => (
-              <tr key={business.id} className="bg-white border-b">
-                <td className="px-4 py-2">{business.id}</td>
-                <td className="px-4 py-2">{business.name}</td>
-                <td className="px-4 py-2">{business.type}</td>
-                <td className="px-4 py-2">{business.location}</td>
+      <h2 className="text-2xl font-bold mb-4">Kelol Akun Mitra</h2>
+
+      {loading ? (
+        <Preloader loading={loading} />
+      ) : error ? (
+        <div>{error}</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table id="Mitra" className="min-w-full table-auto display compact stripe hover">
+            <thead className="bg-gray-200">
+              <tr>
+                <th>No</th>
+                <th>User ID</th>
+                <th>Identifier</th>
+                <th>Name</th>
+                <th>Nomor Telepon</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Is Active</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {/* DataTable will populate rows here */}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
