@@ -1,7 +1,7 @@
 import Sidebar from '../../components/sidebar';
 import React, { useState, useEffect } from 'react'; // Import useEffect for responsive behavior
 import { Outlet } from 'react-router-dom';
-import Header from '../header';
+import Header from '../Header';
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false); // State to track sidebar collapse

@@ -9,7 +9,7 @@ import ForgotPass from './Pages/Password/ForgotPass.tsx';
 import NewPass from './Pages/Password/NewPass.tsx';
 import SuccessPage from './Pages/SuccessPage/SuccessPage.tsx';
 import PrivateRoute from './components/auth/PrivateRoute.js';
-import Kendaraan from './Pages/kategori_bantuan/Kendaraan/Kendaraan'
+import TableCategory from './Pages/TableCategory/index.jsx';
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('authToken'); // Adjust based on your authentication method
@@ -27,7 +27,7 @@ function App() {
           <Route path="usaha" element={<PrivateRoute element={<Usaha />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolamitra" element={<PrivateRoute element={<Mitra />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolaclient" element={<PrivateRoute element={<Client />} isAuthenticated={isAuthenticated} />} />
-          <Route path="kendaraan" element={<PrivateRoute element={<Kendaraan />} isAuthenticated={isAuthenticated} />} />
+          <Route path=":category" element={<PrivateRoute element={<TableCategory />} isAuthenticated={isAuthenticated} />} />
         </Route>
       </Routes>
     </Router>

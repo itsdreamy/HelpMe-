@@ -2,23 +2,25 @@ import $ from 'jquery';
 import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
 import 'datatables.net';
 import React, { useEffect, useState, useCallback } from 'react';
-import { useStoreProblem } from '../../../api/problemApi'; // API hook for delete action
-import Preloader from "../../../components/Preloader"; // Preloader component
+import { useStoreProblem } from '../../api/problemApi';
+import Preloader from '../../components/Preloader'; // Preloader component
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { mockDataKendaraan } from '../../../api/mockData';
+import { mockDataCategory } from '../../api/mockData';
+import { useParams } from 'react-router-dom';
 
-export default function Kendaraan() {
+export default function TableCategory() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const { deleteProblem } = useStoreProblem(); // API for delete action
+  const { category } = useParams();
 
   // Fetch Data from API
   const fetchData = useCallback(async () => {
     try {
-        const response = await mockDataKendaraan();
+        const response = await mockDataCategory(category);
         if (response) {
           const numberedData = response.map((item, index) => ({
             ...item,
@@ -45,11 +47,11 @@ export default function Kendaraan() {
   useEffect(() => {
     if (!loading) {
       // Destroy the previous DataTable instance if it exists
-      if ($.fn.dataTable.isDataTable('#Kendaraan')) {
-        $('#Kendaraan').DataTable().destroy();
+      if ($.fn.dataTable.isDataTable('#' + category)) {
+        $('#' + category).DataTable().destroy();
       }
 
-      $('#Kendaraan').DataTable({
+      $('#' + category).DataTable({
         data: data,
         columns: [
           { title: "No", data: "no" },
@@ -71,7 +73,7 @@ export default function Kendaraan() {
       });
 
       // Handle delete button clicks after DataTable has been initialized
-      $('#Kendaraan tbody').on('click', '.delete-button', function() {
+      $(`#${category} tbody`).on('click', '.delete-button', function() {
         const id = $(this).data('id'); // Get ID from data-id attribute
         setSelectedId(id); // Save the ID to delete
         setOpenDialog(true); // Show confirmation dialog
@@ -94,7 +96,7 @@ export default function Kendaraan() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Kendaraan</h2>
+      <h2 className="text-2xl font-bold mb-4">{category}</h2>
 
       {loading ? (
         <Preloader loading={loading} />
@@ -102,7 +104,7 @@ export default function Kendaraan() {
         <div>{error}</div>
       ) : (
         <div className="overflow-x-auto">
-          <table id="Kendaraan" className="min-w-full table-auto display compact stripe hover">
+          <table id={category.charAt(0).toUpperCase() + category.slice(1)} className="min-w-full table-auto display compact stripe hover">
             <thead className="bg-gray-200">
               <tr>
                 <th>No</th>
