@@ -150,7 +150,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
             <SidebarLink
               key={category.id}
               item={{
-                path: `/${category.name.toLowerCase()}`,
+                path: `/kategori/${category.name.toLowerCase()}`,
                 label: `Bantuan ${category.name}`,
                 icon: categoryIcons[index % categoryIcons.length]
               }}

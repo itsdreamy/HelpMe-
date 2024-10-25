@@ -58,12 +58,128 @@ export const mockDataCategory = async (categoryName) => {
       }
     );
     // console.log(response.data);
+    return response;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
+  }
+};
+
+export const mockDataSerabutan = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // console.error("No token found");
+    return [];
+  }
+  try {
+    const response = await axios.get(
+      API_URL + "/categories/problems?category=serabutan",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // console.log(response);
     return response.data;
   } catch (err) {
     console.error("Error fetching data from API:", err);
     return err;
   }
 };
+
+export const mockDataKendaraan = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // console.error("No token found");
+    return [];
+  }
+  try {
+    const response = await axios.get(
+      API_URL + "/categories/problems?category=kendaraan",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
+  }
+};
+
+export const mockDataRumah = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // console.error("No token found");
+    return [];
+  }
+  try {
+    const response = await axios.get(
+      API_URL + "/categories/problems?category=rumah",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
+  }
+};
+
+export const mockDataElektronik = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // console.error("No token found");
+    return [];
+  }
+  try {
+    const response = await axios.get(
+      API_URL + "/categories/problems?category=elektronik",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
+  }
+};
+
+export const mockDataPersonal = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // console.error("No token found");
+    return [];
+  }
+  try {
+    const response = await axios.get(
+      API_URL + "/categories/problems?category=personal",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
+  }
+};
+
 
 export const listCategory = async () => {
   const token = localStorage.getItem("token");

@@ -9,7 +9,8 @@ import ForgotPass from './Pages/Password/ForgotPass.tsx';
 import NewPass from './Pages/Password/NewPass.tsx';
 import SuccessPage from './Pages/SuccessPage/SuccessPage.tsx';
 import PrivateRoute from './components/auth/PrivateRoute.js';
-import TableCategory from './Pages/TableCategory/index.jsx';
+import LoginRedirect from './components/loginredirect.jsx';
+import KategoriBantuan from './Pages/kategori_bantuan/Bantuan_PerKTR.jsx';
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('authToken'); // Adjust based on your authentication method
@@ -17,6 +18,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LoginRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<ForgotPass />} />
         <Route path="/newpassword" element={<NewPass />} />
@@ -27,7 +29,10 @@ function App() {
           <Route path="usaha" element={<PrivateRoute element={<Usaha />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolamitra" element={<PrivateRoute element={<Mitra />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolaclient" element={<PrivateRoute element={<Client />} isAuthenticated={isAuthenticated} />} />
-          <Route path=":category" element={<PrivateRoute element={<TableCategory />} isAuthenticated={isAuthenticated} />} />
+          <Route
+            path="/kategori/:category"
+            element={<PrivateRoute element={<KategoriBantuan />} />}
+          />
         </Route>
       </Routes>
     </Router>

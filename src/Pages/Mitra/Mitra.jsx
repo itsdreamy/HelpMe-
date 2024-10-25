@@ -64,23 +64,13 @@ export default function Mitra() {
             title: "Actions",
             data: null,
             render: (data, type, row) => {
-              return (
-                <button
-                  onClick={() => handleSubmit(row.id)} // Call handleSubmit with user id
-                  style={{
-                    backgroundColor: row.is_active ? "red" : "green",
-                    color: "white",
-                    border: "none",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {row.is_active ? "Ban" : "Unban"}
+              return `
+                <button class="${row.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-2 py-1 rounded delete-btn" data-id="${row.id}">
+                  ${row.is_active ? 'Ban' : 'Unban'}
                 </button>
-              );
+              `;
             },
-          },
+          },                           
         ],
         paging: true,
         searching: true,
@@ -98,7 +88,7 @@ export default function Mitra() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Kelol Akun Mitra</h2>
+      <h2 className="text-2xl font-bold mb-4">Kelola Akun Mitra</h2>
 
       {loading ? (
         <Preloader loading={loading} />

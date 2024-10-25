@@ -14,7 +14,7 @@ export default function Header() {
       const data = await aboutMe();
       if (data && data.user) {
         setUsername(data.user.username);
-        setProfile(data.user.image_profile);
+        setProfile(BASE_URL + "/" + data.user.image_profile);
       }
       setIsLoading(false); // Set loading to false after fetching
     };

@@ -1,37 +1,41 @@
 import axios from "axios";
 import { API_URL } from "./api";
 import { useState } from "react";
-import { Alert, Snackbar } from "@mui/material";
 
 // Custom hook for storing and deleting a problem
 export const useStoreProblem = () => {
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
 
     // Store a problem
-    const storeProblem = async (name, category_name) => {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-            console.log("No token found");
-            return null;
-        }
+    // Store a problem
+const storeProblem = async (name, category_name) => {
+    const token = localStorage.getItem('token');
 
-        try {
-            const fetchApi = await axios.post(`${API_URL}/categories/problems?category=${category_name}`,
-                { name },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+    if (!token) {
+        console.log("No token found");
+        return null;
+    }
 
-            setAlert({ open: true, message: 'Problem stored successfully!', severity: 'success' });
-            return fetchApi.data;
-        } catch (error) {
-            setAlert({ open: true, message: 'Error storing problem!', severity: 'error' });
-            return null;
-        }
-    };
+    try {
+        console.log("Sending data to API: ", { name, category_name }); // Log to check data
+        const fetchApi = await axios.post(`${API_URL}/categories/problems?category=${category_name}`,
+            { name },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        console.log("API Response: ", fetchApi.data); // Log response
+        setAlert({ open: true, message: 'Problem stored successfully!', severity: 'success' });
+        return fetchApi.data;
+    } catch (error) {
+        console.error("Error storing problem:", error.response?.data || error.message); // Log error
+        setAlert({ open: true, message: 'Error storing problem!', severity: 'error' });
+        return null;
+    }
+};
+
 
     // Delete a problem
-    const deleteProblem = async (problem_id) => {
+        const deleteProblem = async (problem_id) => {
         const token = localStorage.getItem('token');
 
         if (!token) {
@@ -54,9 +58,6 @@ export const useStoreProblem = () => {
         }
     };
 
-    const handleCloseAlert = () => {
-        setAlert({ ...alert, open: false });
-    };
 
-    return { storeProblem, deleteProblem, alert, handleCloseAlert };
+    return { storeProblem, deleteProblem };
 };
