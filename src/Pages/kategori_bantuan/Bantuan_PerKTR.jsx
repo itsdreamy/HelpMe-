@@ -158,8 +158,9 @@ export default function KategoriBantuan() {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await storeProblem(name, selectedHelper, category);
+      const data = await storeProblem(name, selectedHelper);
       if (data) {
+        console.log(data);
         setSnackbarMessage('Entry added successfully!');
         setSnackbarSeverity('success');
         setData(prevData => [...prevData, data]); // Add new entry to state if needed

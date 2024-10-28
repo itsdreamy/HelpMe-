@@ -196,7 +196,7 @@ export const mockDataHelpers = async (category) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (err) {
     console.error("Error fetching data from API:", err);
