@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { mockDataCategory, mockDataMitra } from '../../api/mockData';
+import { mockDataCategory, mockDataHelpers } from '../../api/mockData';
 import Preloader from "../../components/Preloader";
 import ReactModal from 'react-modal';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -56,8 +56,8 @@ export default function KategoriBantuan() {
   const fetchHelperData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await mockDataMitra();
-      if (response && response.data) {
+      const response = await mockDataHelpers(category);
+      if (response) {
         setHelperData(response.data);
       } else {
         console.error("No helper data found");
@@ -158,8 +158,9 @@ export default function KategoriBantuan() {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await storeProblem(name, selectedHelper, category);
+      const data = await storeProblem(name, selectedHelper);
       if (data) {
+        console.log(data);
         setSnackbarMessage('Entry added successfully!');
         setSnackbarSeverity('success');
         setData(prevData => [...prevData, data]); // Add new entry to state if needed
