@@ -92,6 +92,10 @@ const BarChartUsers = () => {
         <div className="flex justify-center mt-10">
           <CircularProgress />
         </div>
+        ) : data.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#333', marginTop: '120px' }}>
+            No data available
+          </div>
       ) : (
         <ResponsiveContainer width="100%" height={230}> {/* Reduce height here */}
           <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: -3 }}> {/* Adjust margins */}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
-import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
-import { mockDataMitra, useStoreProblem } from '../../api/mockData'; // API hook for delete action
-import Preloader from "../../components/Preloader"; // Preloader component
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { mockDataMitra } from '../../api/mockData';
+import Preloader from "../../components/Preloader";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 export default function Usaha() {
@@ -12,36 +12,51 @@ export default function Usaha() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [verifiedRows, setVerifiedRows] = useState({}); // Track verification status
 
   // Fetch Data from API
   const fetchData = useCallback(async () => {
+    setLoading(true); // Start loading
+    setError(null); // Clear previous errors
+  
     try {
       const response = await mockDataMitra();
-      if (response) {
-        const numberedData = response.data.map((item, index) => ({
-          ...item,
-          no: index + 1,
-          problem_id: item.id, // Adjust according to your data structure
-        }));
-        setData(numberedData);
+  
+      // Log the raw response for debugging
+      console.log('API Response:', response);
+  
+      // Check if the response is valid and contains data
+      if (response && response.status === 200) {
+        const { data } = response; // Destructure the data directly from response
+  
+        if (Array.isArray(data)) {
+          const numberedData = data.map((item, index) => ({
+            ...item,
+            no: index + 1, // Add numbering
+          }));
+          setData(numberedData);
+        } else {
+          console.error("Error: Response data is not an array.");
+          setError("Response data is not an array."); // Handle unexpected data type
+        }
       } else {
-        console.error("No data found");
+        console.error(`Error: Received status ${response.status}`);
+        setError(`Received status ${response.status}`); // Handle non-200 responses
       }
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+      console.error("Error fetching data:", err);
+      setError(err.message || "An unexpected error occurred."); // Set a user-friendly error message
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading
     }
   }, []);
-  
+          
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
     if (!loading) {
-      // Destroy the previous DataTable instance if it exists
       if ($.fn.dataTable.isDataTable('#Usaha')) {
         $('#Usaha').DataTable().destroy();
       }
@@ -61,7 +76,16 @@ export default function Usaha() {
             title: "Actions",
             data: null,
             render: (data, type, row) => {
-              return `<button class="delete-button" data-id="${row.id}">Delete</button>`;
+              const isVerified = verifiedRows[row.id];
+              return `
+                <button 
+                  class="bg-green-500 text-white px-2 py-1 rounded verifikasi-btn" 
+                  data-id="${row.id}" 
+                  ${isVerified ? 'disabled' : ''}
+                >
+                  Verifikasi
+                </button>
+              `;
             },
           },
         ],
@@ -69,18 +93,21 @@ export default function Usaha() {
         searching: true,
         ordering: true,
         responsive: true,
-        destroy: true, // Allow the DataTable to be reinitialized
+        destroy: true,
       });
 
-      // Handle delete button clicks after DataTable has been initialized
+      $('#Usaha').on('click', '.verifikasi-button', function () {
+        const rowId = $(this).data('id');
+        setVerifiedRows((prev) => ({ ...prev, [rowId]: true }));
+      });
+
       $('#Usaha tbody').on('click', '.delete-button', function() {
-        const id = $(this).data('id'); // Get ID from data-id attribute
-        setSelectedId(id); // Save the ID to delete
-        setOpenDialog(true); // Show confirmation dialog
+        const id = $(this).data('id');
+        setSelectedId(id);
+        setOpenDialog(true);
       });
     }
-  }, [loading, data]);
-
+  }, [loading, data, verifiedRows]);
 
   return (
     <div className="container mx-auto p-4">
@@ -103,6 +130,7 @@ export default function Usaha() {
                 <th>Latitude</th>
                 <th>Longitude</th>
                 <th>Kategori</th>
+                <th>Actions</th>
               </tr>
             </thead>
           </table>
@@ -110,7 +138,6 @@ export default function Usaha() {
       )}
 
       {/* Confirmation Dialog */}
-      
     </div>
   );
 }

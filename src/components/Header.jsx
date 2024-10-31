@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BASE_URL } from '../api/api';
 import { aboutMe } from '../api/authApi';
 import Preloader from './Preloader'; // Adjust the import path as necessary
 
@@ -11,10 +10,10 @@ export default function Header() {
   useEffect(() => {
     const fetchUserData = async () => {
       setIsLoading(true); // Set loading to true before fetching
-      const data = await aboutMe();
+      const data = await aboutMe(); // Fetch user data
       if (data && data.user) {
-        setUsername(data.user.username);
-        setProfile(data.user.image_profile);
+        setUsername(data.user.username); // Set username
+        setProfile(data.user.image_profile); // Set profile image
       }
       setIsLoading(false); // Set loading to false after fetching
     };

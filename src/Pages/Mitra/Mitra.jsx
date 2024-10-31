@@ -3,6 +3,7 @@ import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
 import { mockDataUsers } from '../../api/mockData'; // API hook for delete action
+import { toggleStatusUser } from '../../api/adminApi'; // API hook for delete action
 import Preloader from "../../components/Preloader"; // Preloader component
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
@@ -13,24 +14,24 @@ export default function Mitra() {
 
   // Fetch Data from API
   const fetchData = useCallback(async () => {
-    try {
-      const response = await mockDataUsers('mitra');
-      if (response && response.data) {
-        const numberedData = response.data.map((item, index) => ({
-          ...item,
-          no: index + 1,
-        }));
-        setData(numberedData);
-      } else {
-        console.error("No data found");
+      try {
+        const response = await mockDataUsers('mitra');
+        if (response && response.data) {
+          const numberedData = response.data.map((item, index) => ({
+            ...item,
+            no: index + 1,
+          }));
+          setData(numberedData);
+        } else {
+          console.error("No data found");
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    }, []);
 
   useEffect(() => {
     fetchData();
@@ -43,7 +44,7 @@ export default function Mitra() {
         $('#Mitra').DataTable().destroy();
       }
 
-      $('#Mitra').DataTable({
+      const table = $('#Mitra').DataTable({
         data: data,
         columns: [
           { title: "No", data: "no" },
@@ -65,7 +66,9 @@ export default function Mitra() {
             data: null,
             render: (data, type, row) => {
               return `
-                <button class="${row.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-2 py-1 rounded delete-btn" data-id="${row.id}">
+                <button 
+                  class="ban-btn ${row.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-2 py-1 rounded" 
+                  data-id="${row.id}">
                   ${row.is_active ? 'Ban' : 'Unban'}
                 </button>
               `;
@@ -78,12 +81,31 @@ export default function Mitra() {
         responsive: true,
         destroy: true, // Allow the DataTable to be reinitialized
       });
+
+      // Handle Ban/Unban button click
+      $('#Mitra tbody').on('click', '.ban-btn', async function() {
+        const id = $(this).data('id'); // Get ID from data-id attribute
+        await handleToggleStatus(id); // Call function to toggle status
+      });
+
+      return () => {
+        // Clean up event listener
+        $('#Mitra tbody').off('click', '.ban-btn');
+      };
     }
   }, [loading, data]);
 
-  const handleSubmit = async (id) => {
-    // Implement your ban/unban logic here
-    console.log("Toggle user status for ID:", id);
+  const handleToggleStatus = async (id) => {
+    try {
+      setLoading(true);
+      await toggleStatusUser(id); // Call API to toggle status
+      await fetchData(); // Refresh data
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      setError("Failed to toggle user status.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

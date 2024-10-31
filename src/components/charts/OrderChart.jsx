@@ -40,8 +40,10 @@ const OrderChart = ({ isDashboard = false }) => {
         );
       }
 
-      if (response) {
+      if (Array.isArray(response)) {
         setData(response);
+      } else {
+        setData([]); // Set to empty array if response is not an array
       }
       setIsLoading(false);
     };
@@ -115,6 +117,10 @@ const OrderChart = ({ isDashboard = false }) => {
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '120px' }}>
           <CircularProgress />
         </div>
+        ) : data.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#333', marginTop: '120px' }}>
+            No data available
+          </div>
       ) : (
         <ResponsiveContainer width="100%" height={210}>
           <BarChart data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>

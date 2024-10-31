@@ -5,7 +5,7 @@ const Preloader = () => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
       <div className="loader"></div>
-      <style jsx>{`
+      <style jsx="true">{`
         .loader {
           border: 8px solid #f3f3f3; /* Light grey */
           border-top: 8px solid #3498db; /* Blue */

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
-import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
-import { mockDataUsers } from '../../api/mockData'; // API hook for delete action
-import Preloader from "../../components/Preloader"; // Preloader component
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { mockDataUsers } from '../../api/mockData';
+import { toggleStatusUser } from '../../api/adminApi';
+import Preloader from "../../components/Preloader";
 
-export default function Client() {
+export default function Mitra() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,7 +38,7 @@ export default function Client() {
 
   useEffect(() => {
     if (!loading) {
-      // Destroy the previous DataTable instance if it exists
+      // Destroy previous DataTable instance if it exists
       if ($.fn.dataTable.isDataTable('#Client')) {
         $('#Client').DataTable().destroy();
       }
@@ -56,44 +56,48 @@ export default function Client() {
           {
             title: "Is Active",
             data: "is_active",
-            render: (data, type, row) => {
-              return row.is_active ? "Active" : "Inactive";
-            },
+            render: (data, type, row) => row.is_active ? "Active" : "Inactive",
           },
           {
             title: "Actions",
             data: null,
-            render: (data, type, row) => {
-              return (
-                <button
-                  onClick={() => handleSubmit(row.id)} // Call handleSubmit with user id
-                  style={{
-                    backgroundColor: row.is_active ? "red" : "green",
-                    color: "white",
-                    border: "none",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {row.is_active ? "Ban" : "Unban"}
+            render: (data, type, row) => `
+              <button 
+                  class="ban-btn ${row.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-2 py-1 rounded" 
+                  data-id="${row.id}">
+                  ${row.is_active ? 'Ban' : 'Unban'}
                 </button>
-              );
-            },
+            `,
           },
         ],
         paging: true,
         searching: true,
         ordering: true,
         responsive: true,
-        destroy: true, // Allow the DataTable to be reinitialized
+        destroy: true,
       });
+      $('#Client tbody').on('click', '.ban-btn', async function() {
+        const id = $(this).data('id'); // Get ID from data-id attribute
+        await handleToggleStatus(id); // Call function to toggle status
+      });
+      return () => {
+        // Clean up event listener
+        $('#Client tbody').off('click', '.ban-btn');
+      };
     }
   }, [loading, data]);
 
-  const handleSubmit = async (id) => {
-    // Implement your ban/unban logic here
-    console.log("Toggle user status for ID:", id);
+  const handleToggleStatus = async (id) => {
+    try {
+      setLoading(true);
+      await toggleStatusUser(id); // Call API to toggle status
+      await fetchData(); // Refresh data
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      setError("Failed to toggle user status.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

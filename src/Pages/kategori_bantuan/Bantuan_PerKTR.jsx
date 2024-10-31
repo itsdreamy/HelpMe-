@@ -158,12 +158,18 @@ export default function KategoriBantuan() {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await storeProblem(name, selectedHelper);
-      if (data) {
-        console.log(data);
+      const newData = await storeProblem(name, selectedHelper);
+      if (newData) {
+        console.log(newData);
         setSnackbarMessage('Entry added successfully!');
         setSnackbarSeverity('success');
-        setData(prevData => [...prevData, data]); // Add new entry to state if needed
+  
+        // Update the data state
+        setData((prevData) => [...prevData, newData]);
+  
+        // Refresh the DataTable
+        const dataTable = $('#Bantuan').DataTable();
+        dataTable.clear().rows.add([...data, newData]).draw(); // Ensure you use the updated data array
       } else {
         throw new Error("No data returned");
       }
@@ -172,11 +178,12 @@ export default function KategoriBantuan() {
       setSnackbarMessage('Failed to add new entry!');
       setSnackbarSeverity('error');
     } finally {
-      setLoading(false);
       setIsAddModalOpen(false); // Ensure modal closes regardless of success or failure
+      setLoading(false);
       setSnackbarOpen(true); // Open the Snackbar
     }
   };
+  
   
 
   return (
@@ -273,14 +280,16 @@ export default function KategoriBantuan() {
 
       {/* Snackbar for notifications */}
       <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+  open={snackbarOpen}
+  autoHideDuration={6000}
+  onClose={() => setSnackbarOpen(false)}
+  anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Set position to top-right
+>
+  <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+    {snackbarMessage}
+  </Alert>
+</Snackbar>
+
     </div>
   );
 }

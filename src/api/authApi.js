@@ -29,7 +29,7 @@ export const aboutMe = async () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // console.error("No token found");
+    console.error("No token found");
     return null;
   }
 
@@ -39,11 +39,20 @@ export const aboutMe = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    // console.log(response);
-    return response.data;
+    
+    console.log({ "response.data": response.data });
+
+    // Return the user object directly if response is successful
+    return response.data; // Adjusting to return the 'user' object directly
   } catch (e) {
-    console.error("Error fetching about me:", e);
-    return e;
+    if (e.response) {
+      console.error("Error response data:", e.response.data);
+      console.error("Error response status:", e.response.status);
+      console.error("Error response headers:", e.response.headers);
+    } else {
+      console.error("Error message:", e.message);
+    }
+    return null;
   }
 };
 

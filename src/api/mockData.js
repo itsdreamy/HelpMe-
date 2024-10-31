@@ -22,6 +22,8 @@ export const mockDataMitra = async () => {
   }
 };
 
+
+
 export const mockDataUsers = async (role) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -69,7 +71,7 @@ export const listCategory = async () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // console.error("No token found");
+    console.error("No token found");
     return [];
   }
 
@@ -79,11 +81,11 @@ export const listCategory = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    // console.log(response);
-    return response.data;
+    console.log( response.data.data);
+    return response.data.data;
   } catch (err) {
-    console.error("Error fetching data from API:", err);
-    return err;
+    console.error("Error fetching data from API:", err.response ? err.response.data : err);
+    return [];
   }
 };
 
@@ -91,7 +93,7 @@ export const fetchClientAndMitraStats = async () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // console.error("No token found");
+     //console.error("No token found");
     return null;
   }
 
@@ -101,8 +103,8 @@ export const fetchClientAndMitraStats = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    // console.log('USER' + response);
-    return response.data;
+     console.log({"response.data": response.data});
+    return response;
   } catch (error) {
     console.error("Error fetching client and mitra stats:", error);
     return error;
@@ -136,10 +138,10 @@ export const fetchUserStatsByGranularity = async (granularity, year = null, star
         },
       }
     );
-    console.log({'USER': response.data});
+    // console.log({'USER': response.data});
     return response;
   } catch (error) {
-    console.error("Error fetching user stats:", error);
+    // console.error("Error fetching user stats:", error);
     return null;
   }
 };

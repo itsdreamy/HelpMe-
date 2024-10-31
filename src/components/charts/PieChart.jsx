@@ -12,15 +12,16 @@ const PieChartDiff = () => {
       setIsLoading(true);
       const stats = await fetchClientAndMitraStats();
       if (stats) {
+        //console.log(stats.data);
         setData([
           {
             name: "Client",
-            value: stats.client_count,
+            value: stats.data.client_count,
             color: "#543310", // Client color
           },
           {
             name: "Mitra",
-            value: stats.mitra_count,
+            value: stats.data.mitra_count,
             color: "#AF8F6F", // Mitra color
           },
         ]);
@@ -36,6 +37,10 @@ const PieChartDiff = () => {
         <div className="flex justify-center">
           <CircularProgress />
         </div>
+        ) : data.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#333', marginTop: '80px'}}>
+            No data available
+          </div>
       ) : (
         <PieChart width={400} height={400} margin={{ top: -65, right: 0, left: 0, bottom: 0 }}> {/* Ensure no margin on PieChart */}
           <Pie
