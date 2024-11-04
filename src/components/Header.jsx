@@ -12,6 +12,7 @@ export default function Header() {
       setIsLoading(true); // Set loading to true before fetching
       const data = await aboutMe(); // Fetch user data
       if (data && data.user) {
+        console.log(data.user);
         setUsername(data.user.username); // Set username
         setProfile(data.user.image_profile); // Set profile image
       }
