@@ -1,7 +1,7 @@
 // src/controllers/LoginController.js
 
 import axios from "axios";
-import { API_URL } from "./api";
+import { API_URL } from './api';
 const AUTH_API = API_URL + "/auth";
 
 export const login = async (username, password) => {
@@ -40,7 +40,7 @@ export const aboutMe = async () => {
       },
     });
     
-    console.log({ "response.data": response.data });
+    // console.log({ "response.data": response.data });
 
     // Return the user object directly if response is successful
     return response.data; // Adjusting to return the 'user' object directly

@@ -22,8 +22,6 @@ export const mockDataMitra = async () => {
   }
 };
 
-
-
 export const mockDataUsers = async (role) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -59,7 +57,7 @@ export const mockDataCategory = async (categoryName) => {
         },
       }
     );
-    // console.log(response.data);
+    // console.log(response);
     return response;
   } catch (err) {
     console.error("Error fetching data from API:", err);
@@ -81,8 +79,8 @@ export const listCategory = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log( response.data.data);
-    return response.data.data;
+    // console.log( response.data);
+    return response.data;
   } catch (err) {
     console.error("Error fetching data from API:", err.response ? err.response.data : err);
     return [];
@@ -103,7 +101,7 @@ export const fetchClientAndMitraStats = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-     console.log({"response.data": response.data});
+    //  console.log({"response.data": response.data});
     return response;
   } catch (error) {
     console.error("Error fetching client and mitra stats:", error);
