@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL } from "./api";
+import { API_URL } from "../api";
 
 export const mockDataMitra = async () => {
   const token = localStorage.getItem("token");
@@ -42,7 +42,7 @@ export const mockDataUsers = async (role) => {
   }
 };
 
-export const mockDataCategory = async (categoryName) => {
+export const mockDataProblem = async (categoryName) => {
   const token = localStorage.getItem("token");
   if (!token) {
     // console.error("No token found");

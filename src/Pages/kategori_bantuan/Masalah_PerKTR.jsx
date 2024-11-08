@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { mockDataCategory, mockDataHelpers } from '../../api/mockData';
+import { mockDataProblem } from '../../api/mockData';
 import Preloader from "../../components/Preloader";
 import ReactModal from 'react-modal';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -18,7 +18,6 @@ export default function KategoriBantuan() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { category } = useParams();
-  const [helperData, setHelperData] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -36,7 +35,7 @@ export default function KategoriBantuan() {
     setLoading(true);
     setError(null);
     try {
-      const response = await mockDataCategory(category);
+      const response = await mockDataProblem(category);
       if (response && response.data) {
         const numberedData = response.data.map((item, index) => ({
           ...item,
@@ -53,26 +52,9 @@ export default function KategoriBantuan() {
     }
   }, [category]);
 
-  const fetchHelperData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await mockDataHelpers(category);
-      if (response) {
-        setHelperData(response.data);
-      } else {
-        console.error("No helper data found");
-      }
-    } catch (err) {
-      console.error("Error fetching helper data:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     fetchCategoryData();
-    fetchHelperData();
-  }, [fetchCategoryData, fetchHelperData]);
+  }, [fetchCategoryData]);
 
   useEffect(() => {
     if (!loading && !error) {
@@ -253,20 +235,6 @@ export default function KategoriBantuan() {
             onChange={(e) => setName(e.target.value)}
             margin="normal"
           />
-          <TextField
-            select
-            label="Helper"
-            fullWidth
-            value={selectedHelper}
-            onChange={(e) => setSelectedHelper(e.target.value)}
-            margin="normal"
-          >
-            {helperData.map((helper) => (
-              <MenuItem key={helper.id} value={helper.id}>
-                {helper.name}
-              </MenuItem>
-            ))}
-          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddModalOpen(false)} color="primary">

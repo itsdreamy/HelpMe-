@@ -135,7 +135,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
 
       {/* Kelola Bantuan Section */}
       <div className="py-2 flex flex-col gap-0.5">
-        {!collapsedState && <p className="px-3 pb-2 font-medium">Kategori Bantuan</p>}
+        {!collapsedState && <p className="px-3 pb-2 font-medium">Kelola Kategori</p>}
         {DASHBOARD_BANTUAN.map((item) => (
           <SidebarLink key={item.key} item={item} isCollapsed={collapsedState} />
         ))}
@@ -143,7 +143,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
 
       {/* Kategori Bantuan Section */}
       <div className="py-2 flex flex-col gap-0.5">
-        {!collapsedState && <p className="px-3 pb-2 font-medium">Kategori Bantuan</p>}
+        {!collapsedState && <p className="px-3 pb-2 font-medium">List Kategori</p>}
         {categories.map((category, index) => (
           <div key={category.id}>
             <div

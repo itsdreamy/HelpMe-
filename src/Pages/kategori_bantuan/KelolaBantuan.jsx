@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { mockDataCategory, mockDataHelpers } from '../../api/mockData';
+import { mockDataHelpers } from '../../api/mockData';
 import Preloader from "../../components/Preloader";
 import ReactModal from 'react-modal';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,32 +32,12 @@ export default function KategoriBantuan() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const fetchCategoryData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await mockDataCategory(category);
-      if (response && response.data) {
-        const numberedData = response.data.map((item, index) => ({
-          ...item,
-          no: index + 1,
-        }));
-        setData(numberedData);
-      } else {
-        throw new Error("No data found");
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [category]);
-
   const fetchHelperData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await mockDataHelpers(category);
       if (response) {
+        console.log({'HELPER': response.data});
         setHelperData(response.data);
       } else {
         console.error("No helper data found");
@@ -70,9 +50,8 @@ export default function KategoriBantuan() {
   }, []);
 
   useEffect(() => {
-    fetchCategoryData();
     fetchHelperData();
-  }, [fetchCategoryData, fetchHelperData]);
+  }, [fetchHelperData]);
 
   useEffect(() => {
     if (!loading && !error) {

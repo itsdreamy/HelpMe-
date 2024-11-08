@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL } from "./api";
+import { API_URL } from "../api";
 import { useState } from "react";
 
 // Custom hook for storing and deleting a problem

@@ -1,27 +1,17 @@
-// src/controllers/LoginController.js
-
 import axios from "axios";
-import { API_URL } from './api';
-const AUTH_API = API_URL + "/auth";
+import { API_URL } from "./api";
 
 export const login = async (username, password) => {
   try {
-    const response = await axios.post(AUTH_API + "/login?app_type=admin", {
-      username: username,
-      password: password,
+    const response = await axios.post(API_URL + "/auth/login?app_type=admin", {
+      username,
+      password,
     });
-
-    // Jika login berhasil, misal response ada token
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token); // Simpan token ke localStorage
-      // console.log(response);
-      return response.data;
-    }
-
-    return null; // Jika tidak ada token, login gagal
-  } catch (error) {
-    console.error("Login failed:", error.response.data);
-    return error;
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error logging in:", err);
+    return err;
   }
 };
 
@@ -34,91 +24,139 @@ export const aboutMe = async () => {
   }
 
   try {
-    const response = await axios.get(AUTH_API + "/me", {
+    const response = await axios.get(API_URL + "/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    
-    // console.log({ "response.data": response.data });
-
-    // Return the user object directly if response is successful
-    return response.data; // Adjusting to return the 'user' object directly
-  } catch (e) {
-    if (e.response) {
-      console.error("Error response data:", e.response.data);
-      console.error("Error response status:", e.response.status);
-      console.error("Error response headers:", e.response.headers);
-    } else {
-      console.error("Error message:", e.message);
-    }
-    return null;
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching data from API:", err);
+    return err;
   }
 };
 
-export const logout = async () => {
-  const token = localStorage.getItem("token"); // Ambil token dari localStorage
+export const changePassword = async (
+  oldPassword,
+  newPassword,
+  confirmNewPassword
+) => {
+  const token = localStorage.getItem("token");
 
   if (!token) {
-    // console.error("No token found");
+    console.error("No token found");
     return null;
   }
 
   try {
     const response = await axios.post(
-      AUTH_API + "/logout",
-      {},
+      API_URL + "/auth/change-password",
+      {
+        current_password: oldPassword,
+        new_password: newPassword,
+        new_password_confirmation: confirmNewPassword,
+      },
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Kirim token di header Authorization
+          Authorization: `Bearer ${token}`,
         },
       }
     );
-
-    // Jika logout berhasil, hapus token dari localStorage
-    localStorage.removeItem("token");
-    // console.log("Logout successful", response.data);
+    console.log(response.data);
     return response.data;
-  } catch (error) {
-    console.error("Error during logout:", error);
-    return error;
+  } catch (err) {
+    console.error("Error changing password:", err);
+    return err;
   }
 };
 
-// export const changePassword = async () => {
+export const logout = async () => {
+  const token = localStorage.getItem("token");
 
-// }
-
-export const forgotPassword = async (phone_number) => {
-  try {
-    const response = await axios.post(AUTH_API + "/forgot-password", {
-      phone_number: phone_number,
-    });
-    // console.log('Reset password response:', response);
-    return response;
-  } catch (err) {
-    // console.error('Error during reset password:', err);
+  if (!token) {
+    console.error("No token found");
     return null;
+  }
+
+  try {
+    const response = await axios.post(
+      API_URL + "/auth/logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error logging out:", err);
+    return err;
+  }
+};
+
+export const editProfile = async (fullName, username, phoneNumber) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    console.error("No token found");
+    return null;
+  }
+
+  try {
+    const response = await axios.put(
+      API_URL + "/users/profile",
+      {
+        full_name: fullName,
+        username: username,
+        phone_number: phoneNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error editing profile:", err);
+    return err;
+  }
+};
+
+export const forgotPassword = async (phoneNumber) => {
+  try {
+    const response = await axios.post(API_URL + "/auth/forgot-password", {
+      phone_number: phoneNumber,
+    });
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error sending forgot password:", err);
+    return err;
   }
 };
 
 export const resetPassword = async (
+  phoneNumber,
   token,
-  phone_number,
   password,
   confirmPassword
 ) => {
   try {
-    const response = await axios.post(AUTH_API + "/reset-password", {
+    const response = await axios.post(API_URL + "/auth/reset-password", {
+      phone_number: phoneNumber,
       token: token,
-      phone_number: phone_number,
       password: password,
       password_confirmation: confirmPassword,
     });
-    // console.log("Reset password response:", response);
-    return response;
+    console.log(response.data);
+    return response.data;
   } catch (err) {
-    // console.error('Error during reset password:', err.response.data.errors);
+    console.error("Error resetting password:", err);
     return err;
   }
 };
