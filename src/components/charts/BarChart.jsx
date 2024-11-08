@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Legend } from 'recharts';
-import { CircularProgress } from '@mui/material'; // Import from MUI
-import { fetchUserStatsByGranularity } from '../../api/mockData'; // Update this path as necessary
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CircularProgress } from '@mui/material';
+import { fetchUserStatsByGranularity } from '../../api/mockData';
 
 const BarChartUsers = () => {
   const [data, setData] = useState([]);
   const [granularity, setGranularity] = useState("yearly");
   const [year, setYear] = useState("");
-  const [startYear, setStartYear] = useState("2011");
-  const [endYear, setEndYear] = useState("2024");
+  const [startYear, setStartYear] = useState("2024");
+  const [endYear, setEndYear] = useState("2030");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -92,20 +92,23 @@ const BarChartUsers = () => {
         <div className="flex justify-center mt-10">
           <CircularProgress />
         </div>
-        ) : data.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#333', marginTop: '120px' }}>
-            No data available
-          </div>
+      ) : data.length === 0 ? (
+        <div style={{ textAlign: 'center', color: '#333', marginTop: '120px' }}>
+          No data available
+        </div>
       ) : (
-        <ResponsiveContainer width="100%" height={230}> {/* Reduce height here */}
-          <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: -3 }}> {/* Adjust margins */}
+        <ResponsiveContainer width="100%" height={230}>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: -3 }}>
             <XAxis dataKey="period" />
-            <YAxis />
+            <YAxis 
+              tickFormatter={(tick) => Math.round(tick)} 
+              allowDecimals={false} 
+              domain={[0, 'dataMax']} 
+              tickCount={6} 
+            />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#B5C18E">
-              <LabelList dataKey="count" position="top" />
-            </Bar>
+            <Bar dataKey="count" fill="#B5C18E" />
           </BarChart>
         </ResponsiveContainer>
       )}

@@ -3,10 +3,7 @@ import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_USAHA, DASHBOARD_USERS, DASHBOARD_BA
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { HiOutlineLogout } from 'react-icons/hi';
-import { LiaHandsHelpingSolid } from "react-icons/lia";
-import { BsHouseExclamation } from "react-icons/bs";
-import { IoCarSportOutline } from "react-icons/io5";
-import { MdOutlineElectricalServices } from "react-icons/md";
+import { TbHelpTriangle } from "react-icons/tb";
 import { listCategory } from "../api/mockData";
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { logout } from "../api/authApi";
@@ -18,15 +15,13 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [categories, setCategories] = useState([]); 
   const [selected, setSelected] = useState(''); 
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [collapsedState, setCollapsedState] = useState(isCollapsed);
 
   const categoryIcons = [
-    <LiaHandsHelpingSolid />,
-    <IoCarSportOutline />,
-    <BsHouseExclamation />,
-    <MdOutlineElectricalServices />
+    <TbHelpTriangle />
   ];
 
   const fetchCategoryList = async () => {
@@ -87,6 +82,11 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
     setCollapsedState(!collapsedState);
   };
 
+  const handleToggleDropdown = (categoryId) => {
+    setSelectedCategory(prev => (prev === categoryId ? null : categoryId));
+  };
+
+
   
   return (
     <div
@@ -135,7 +135,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
 
       {/* Kelola Bantuan Section */}
       <div className="py-2 flex flex-col gap-0.5">
-        {!collapsedState && <p className="px-3 pb-2 font-medium">Kelola Bantuan</p>}
+        {!collapsedState && <p className="px-3 pb-2 font-medium">Kategori Bantuan</p>}
         {DASHBOARD_BANTUAN.map((item) => (
           <SidebarLink key={item.key} item={item} isCollapsed={collapsedState} />
         ))}
@@ -144,19 +144,30 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
       {/* Kategori Bantuan Section */}
       <div className="py-2 flex flex-col gap-0.5">
         {!collapsedState && <p className="px-3 pb-2 font-medium">Kategori Bantuan</p>}
-        {categories
-          .filter(category => category.id) // Ensure there's a valid id
-          .map((category, index) => (
-            <SidebarLink
-              key={category.id}
-              item={{
-                path: `/kategori/${category.name.toLowerCase()}`,
-                label: `Bantuan ${category.name}`,
-                icon: categoryIcons[index % categoryIcons.length]
-              }}
-              isCollapsed={collapsedState}
-            />
-          ))}
+        {categories.map((category, index) => (
+          <div key={category.id}>
+            <div
+              onClick={() => handleToggleDropdown(category.id)}
+              className={classNames(linkClasses, 'cursor-pointer')}
+            >
+              <span className='text-xl'>{categoryIcons[index % categoryIcons.length]}</span>
+              {!collapsedState && `Bantuan ${category.name}`}
+            </div>
+            
+            {/* Dropdown Content */}
+            {selectedCategory === category.id && (
+              <div className="pl-8 flex flex-col gap-1">
+                {/* Replace with dropdown items */}
+                <Link to={`/kategori/${category.name.toLowerCase()}/bantuan`} className={classNames(linkClasses, 'text-sm')}>
+                  Bantuan
+                </Link>
+                <Link to={`/kategori/${category.name.toLowerCase()}/masalah`} className={classNames(linkClasses, 'text-sm')}>
+                  Masalah
+                </Link>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Logout Section */}

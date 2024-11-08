@@ -131,7 +131,10 @@ const OrderChart = ({ isDashboard = false }) => {
             />
             <YAxis 
               tick={{ fill: "#333" }} 
-              label={{ value: "Order Count", angle: -90, position: "insideLeft", fill: "#333" }} 
+              tickFormatter={(tick) => Math.round(tick)} 
+              allowDecimals={false} 
+              domain={[0, 'dataMax']} 
+              tickCount={6} 
             />
             <Tooltip 
               contentStyle={{ backgroundColor: '#f4f4f4', color: '#333' }} 

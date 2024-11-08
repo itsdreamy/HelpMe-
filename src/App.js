@@ -10,9 +10,10 @@ import NewPass from './Pages/Password/NewPass.tsx';
 import SuccessPage from './Pages/SuccessPage/SuccessPage.tsx';
 import PrivateRoute from './components/auth/PrivateRoute.js';
 import LoginRedirect from './components/loginredirect.jsx';
-import KategoriBantuan from './Pages/kategori_bantuan/Bantuan_PerKTR.jsx';
+import MasalahPerKTR from './Pages/kategori_bantuan/Masalah_PerKTR.jsx';
+import KategoriBantuan from './Pages/kategori_bantuan/KelolaBantuan.jsx';
 import NotFound from './Pages/NotFoundPage.jsx';
-import KelolaBantuan from './Pages/kategori_bantuan/KelolaBantuan.jsx';
+import KelolaKategori from './Pages/kategori_bantuan/KelolaKategori.jsx';
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('authToken'); // Adjust based on your authentication method
@@ -32,10 +33,14 @@ function App() {
           <Route path="usaha" element={<PrivateRoute element={<Usaha />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolamitra" element={<PrivateRoute element={<Mitra />} isAuthenticated={isAuthenticated} />} />
           <Route path="kelolaclient" element={<PrivateRoute element={<Client />} isAuthenticated={isAuthenticated} />} />
-          <Route path="kelolabantuan" element={<PrivateRoute element={<KelolaBantuan />} isAuthenticated={isAuthenticated} />} />
+          <Route path="kelolakategori" element={<PrivateRoute element={<KelolaKategori />} isAuthenticated={isAuthenticated} />} />
           <Route
-            path="/kategori/:category"
+            path="/kategori/:category/bantuan"
             element={<PrivateRoute element={<KategoriBantuan />} />}
+          />
+          <Route
+            path="/kategori/:category/masalah"
+            element={<PrivateRoute element={<MasalahPerKTR />} />}
           />
         </Route>
       </Routes>

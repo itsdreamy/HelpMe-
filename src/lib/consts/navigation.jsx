@@ -44,8 +44,8 @@ export const DASHBOARD_USERS = [
 export const DASHBOARD_BANTUAN = [
 	{
 		key: 'bantuan',
-		label: 'Kelola Bantuan',
-		path: '/kelolabantuan',
+		label: 'Kelola Kategori',
+		path: '/kelolakategori',
 		icon: <TbHelpOctagon />
 	},
 ];

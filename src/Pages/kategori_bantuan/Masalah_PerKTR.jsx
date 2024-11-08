@@ -188,7 +188,7 @@ export default function KategoriBantuan() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">{`Kelola Bantuan ${category.charAt(0).toUpperCase() + category.slice(1)}`}</h2>
+      <h2 className="text-2xl font-bold mb-4">{`Kelola Masalah ${category.charAt(0).toUpperCase() + category.slice(1)}`}</h2>
 
       <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} className="mt-4">
         Tambah Masalah
