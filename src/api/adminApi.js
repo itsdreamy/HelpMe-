@@ -134,18 +134,27 @@ export const statsBetweenClientAndMitra = async () => {
   }
 
   try {
-    const response = await axios.get(API_URL + `/users/stats?client-mitra`, {
+    const response = await axios.get(`${API_URL}/users/stats?type=client-mitra`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data);
-    return response.data;
+
+    console.log("Response data:", response.data);
+
+    // Ensure `client_count` exists in the data, or provide a fallback value
+    if (response.data && response.data.client_count !== undefined) {
+      return response.data;
+    } else {
+      console.warn("client_count is missing in the response data");
+      return { client_count: 0 }; // Default fallback
+    }
   } catch (error) {
     console.error("Error fetching stats between mitra and client:", error);
-    return error;
+    return null; // Standardize error handling with null
   }
 };
+
 
 export const statsUserByGranularity = async (
   granularity,

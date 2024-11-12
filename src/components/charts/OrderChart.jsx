@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CircularProgress } from '@mui/material';
-import { orderStats } from '../../api/mockData';
+import { statsOrderByGranularity } from '../../api/adminApi';
 
 const OrderChart = ({ isDashboard = false }) => {
   const [data, setData] = useState([]);
@@ -22,13 +22,13 @@ const OrderChart = ({ isDashboard = false }) => {
 
       // Fetch data based on granularity
       if (granularity === 'hourly') {
-        response = await orderStats(status, granularity, date);
+        response = await statsOrderByGranularity(status, granularity, date);
       } else if (granularity === 'daily') {
-        response = await orderStats(status, granularity, null, startDate, endDate);
+        response = await statsOrderByGranularity(status, granularity, null, startDate, endDate);
       } else if (granularity === "monthly" && year) {
-        response = await orderStats(status, granularity, null, null, year);
+        response = await statsOrderByGranularity(status, granularity, null, null, year);
       } else if (granularity === "yearly" && startYear && endYear) {
-        response = await orderStats(
+        response = await statsOrderByGranularity(
           status,
           granularity,
           null,

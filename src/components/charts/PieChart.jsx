@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { CircularProgress } from "@mui/material";
-import { fetchClientAndMitraStats } from "../../api/mockData";
+import { statsBetweenClientAndMitra } from "../../api/adminApi";
 
 const PieChartDiff = () => {
   const [data, setData] = useState([]);
@@ -10,7 +10,7 @@ const PieChartDiff = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const stats = await fetchClientAndMitraStats();
+      const stats = await statsBetweenClientAndMitra();
       if (stats) {
         //console.log(stats.data);
         setData([

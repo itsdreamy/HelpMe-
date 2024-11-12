@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { CircularProgress } from '@mui/material';
-import { fetchUserStatsByGranularity } from '../../api/mockData';
+import { statsUserByGranularity } from '../../api/adminApi';
 
 const BarChartUsers = () => {
   const [data, setData] = useState([]);
@@ -17,9 +17,9 @@ const BarChartUsers = () => {
       let response = null;
 
       if (granularity === "monthly" && year) {
-        response = await fetchUserStatsByGranularity(granularity, year);
+        response = await statsUserByGranularity(granularity, year);
       } else if (granularity === "yearly" && startYear && endYear) {
-        response = await fetchUserStatsByGranularity(granularity, null, startYear, endYear);
+        response = await statsUserByGranularity(granularity, null, startYear, endYear);
       }
 
       if (response && response.data) {

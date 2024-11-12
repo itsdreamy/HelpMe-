@@ -1,116 +1,118 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
-import 'datatables.net-dt/css/dataTables.dataTables.css'; // Import DataTables styling
-import { mockDataUsers } from '../../api/mockData'; // API hook for delete action
-import { toggleStatusUser } from '../../api/adminApi'; // API hook for delete action
-import Preloader from "../../components/Preloader"; // Preloader component
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { listMitras } from '../../api/mitraApi';
+import { verifyMitra } from '../../api/mitraApi';
+import Preloader from "../../components/Preloader";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 export default function Mitra() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [verifiedRows, setVerifiedRows] = useState({}); // Track verification status
 
   // Fetch Data from API
   const fetchData = useCallback(async () => {
-      try {
-        const response = await mockDataUsers('mitra');
-        if (response && response.data) {
-          const numberedData = response.data.map((item, index) => ({
+    setLoading(true); // Start loading
+    setError(null); // Clear previous errors
+  
+    try {
+      const response = await mockDataMitra();
+  
+      // Log the raw response for debugging
+      console.log('API Response:', response);
+  
+      // Check if the response is valid and contains data
+      if (response && response.status === 200) {
+        const { data } = response; // Destructure the data directly from response
+  
+        if (Array.isArray(data)) {
+          const numberedData = data.map((item, index) => ({
             ...item,
-            no: index + 1,
+            no: index + 1, // Add numbering
           }));
           setData(numberedData);
         } else {
-          console.error("No data found");
+          console.error("Error: Response data is not an array.");
+          setError("Response data is not an array."); // Handle unexpected data type
         }
-      } catch (err) {
-        setError(err.message);
-        console.error(err);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error(`Error: Received status ${response.status}`);
+        setError(`Received status ${response.status}`); // Handle non-200 responses
       }
-    }, []);
-
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err.message || "An unexpected error occurred."); // Set a user-friendly error message
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  }, []);
+          
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
     if (!loading) {
-      // Destroy the previous DataTable instance if it exists
-      if ($.fn.dataTable.isDataTable('#Mitra')) {
-        $('#Mitra').DataTable().destroy();
+      if ($.fn.dataTable.isDataTable('#Usaha')) {
+        $('#Usaha').DataTable().destroy();
       }
 
-      const table = $('#Mitra').DataTable({
+      $('#Usaha').DataTable({
         data: data,
         columns: [
           { title: "No", data: "no" },
-          { title: "User ID", data: "id" },
-          { title: "Identifier", data: "identifier" },
-          { title: "Name", data: "full_name" },
-          { title: "Nomor Telepon", data: "phone_number" },
-          { title: "Username", data: "username" },
-          { title: "Role", data: "role" },
-          {
-            title: "Is Active",
-            data: "is_active",
-            render: (data, type, row) => {
-              return row.is_active ? "Active" : "Inactive";
-            },
-          },
+          { title: "Mitra ID", data: "id" },
+          { title: "Owner Identifier", data: "owner_identifier" },
+          { title: "Name", data: "name" },
+          { title: "Saldo", data: "saldo" },
+          { title: "Latitude", data: "latitude" },
+          { title: "Longitude", data: "longitude" },
+          { title: "Kategori", data: "category" },
           {
             title: "Actions",
             data: null,
             render: (data, type, row) => {
+              const isVerified = verifiedRows[row.id];
               return `
                 <button 
-                  class="ban-btn ${row.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-2 py-1 rounded" 
-                  data-id="${row.id}">
-                  ${row.is_active ? 'Ban' : 'Unban'}
+                  class="bg-green-500 text-white px-2 py-1 rounded verifikasi-btn" 
+                  data-id="${row.id}" 
+                  ${isVerified ? 'disabled' : ''}
+                >
+                  Verifikasi
                 </button>
               `;
             },
-          },                           
+          },
         ],
         paging: true,
         searching: true,
         ordering: true,
         responsive: true,
-        destroy: true, // Allow the DataTable to be reinitialized
+        destroy: true,
       });
 
-      // Handle Ban/Unban button click
-      $('#Mitra tbody').on('click', '.ban-btn', async function() {
-        const id = $(this).data('id'); // Get ID from data-id attribute
-        await handleToggleStatus(id); // Call function to toggle status
+      $('#Usaha').on('click', '.verifikasi-button', function () {
+        const rowId = $(this).data('id');
+        setVerifiedRows((prev) => ({ ...prev, [rowId]: true }));
       });
 
-      return () => {
-        // Clean up event listener
-        $('#Mitra tbody').off('click', '.ban-btn');
-      };
+      $('#Usaha tbody').on('click', '.delete-button', function() {
+        const id = $(this).data('id');
+        setSelectedId(id);
+        setOpenDialog(true);
+      });
     }
-  }, [loading, data]);
-
-  const handleToggleStatus = async (id) => {
-    try {
-      setLoading(true);
-      await toggleStatusUser(id); // Call API to toggle status
-      await fetchData(); // Refresh data
-    } catch (error) {
-      console.error("Error toggling status:", error);
-      setError("Failed to toggle user status.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loading, data, verifiedRows]);
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Kelola Akun Mitra</h2>
+      <h2 className="text-2xl font-bold mb-4">Kelola Usaha Mitra</h2>
 
       {loading ? (
         <Preloader loading={loading} />
@@ -118,26 +120,25 @@ export default function Mitra() {
         <div>{error}</div>
       ) : (
         <div className="overflow-x-auto">
-          <table id="Mitra" className="min-w-full table-auto display compact stripe hover">
+          <table id="Usaha" className="min-w-full table-auto display compact stripe hover">
             <thead className="bg-gray-200">
               <tr>
                 <th>No</th>
-                <th>User ID</th>
-                <th>Identifier</th>
+                <th>Mitra ID</th>
+                <th>Owner Identifier</th>
                 <th>Name</th>
-                <th>Nomor Telepon</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Is Active</th>
+                <th>Saldo</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Kategori</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {/* DataTable will populate rows here */}
-            </tbody>
           </table>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
     </div>
   );
 }

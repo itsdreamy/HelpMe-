@@ -2,11 +2,11 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { mockDataProblem } from '../../api/mockData';
+import { listProblems } from '../../api/categoryApi';
 import Preloader from "../../components/Preloader";
 import ReactModal from 'react-modal';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useStoreProblem } from '../../api/problemApi';
+import { storeProblem, deleteProblem } from '../../api/categoryApi';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Button, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
@@ -23,7 +23,6 @@ export default function KategoriBantuan() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedHelper, setSelectedHelper] = useState('');
   const [name, setName] = useState('');
-  const { deleteProblem, storeProblem } = useStoreProblem();
   const navigate = useNavigate();
 
   // Snackbar state
@@ -35,7 +34,7 @@ export default function KategoriBantuan() {
     setLoading(true);
     setError(null);
     try {
-      const response = await mockDataProblem(category);
+      const response = await listProblems(category);
       if (response && response.data) {
         const numberedData = response.data.map((item, index) => ({
           ...item,

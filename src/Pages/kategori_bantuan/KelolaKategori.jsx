@@ -2,10 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { listCategory } from '../../api/mockData'; // API hook for category data
+import { listCategory } from '../../api/categoryApi'; // API hook for category data
 import Preloader from "../../components/Preloader"; // Preloader component
 import ReactModal from 'react-modal';
-import { useStoreCategory } from '../../api/categoryApi';
+import { storeCategory, deleteCategory } from '../../api/categoryApi';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
@@ -23,7 +23,6 @@ export default function KelolaKategori() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const { deleteCategory, storeCategory } = useStoreCategory();
 
     // Fetch Data from API
     const fetchData = useCallback(async () => {

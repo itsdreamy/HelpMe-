@@ -20,8 +20,8 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 export const DASHBOARD_USAHA = [
 	{
 		key: 'usaha',
-		label: 'Usaha Mitra',
-		path: '/usaha',
+		label: 'Kelola Usaha Mitra',
+		path: '/usahamitra',
 		icon: <AiOutlineShop />
 	}
 ];
@@ -30,7 +30,7 @@ export const DASHBOARD_USERS = [
 	{
 		key: 'mitra',
 		label: 'Kelola Mitra',
-		path: '/kelolamitra',
+		path: '/kelolaMitra',
 		icon: <RiUserLocationLine />
 	},
 	{
