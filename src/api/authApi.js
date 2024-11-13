@@ -7,7 +7,7 @@ export const login = async (username, password) => {
       username,
       password,
     });
-    console.log(response.data);
+    // console.log(response.data);
     localStorage.setItem("token", response.data.token);
     return response.data;
   } catch (err) {
@@ -30,7 +30,7 @@ export const aboutMe = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (err) {
     console.error("Error fetching data from API:", err);

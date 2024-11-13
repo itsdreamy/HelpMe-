@@ -134,11 +134,14 @@ export const statsBetweenClientAndMitra = async () => {
   }
 
   try {
-    const response = await axios.get(`${API_URL}/users/stats?type=client-mitra`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.post(
+      `${API_URL}/users?stats=client-mitra`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     console.log("Response data:", response.data);
 
@@ -178,18 +181,16 @@ export const statsUserByGranularity = async (
   }
 
   try {
-    const response = await axios.get(
-      API_URL + `/users/stats?granularity`,
-      {
-        body,
-      },
+    const response = await axios.post(
+      API_URL + `/users?stats=granularity`,
+      body,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching stats user by granularity:", error);
