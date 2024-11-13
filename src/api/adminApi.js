@@ -155,7 +155,6 @@ export const statsBetweenClientAndMitra = async () => {
   }
 };
 
-
 export const statsUserByGranularity = async (
   granularity,
   year = null,

@@ -13,24 +13,22 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true
-    setErrorMessage(''); // Reset message
+    setIsLoading(true);
+    setErrorMessage('');
     
     try {
       const data = await login(username, password);
+      console.log(data);
       
       if (data && data.token) {
-        // If login is successful
         navigate('/dashboard');
       } else {
-        // If login fails (invalid credentials)
         setErrorMessage('Login failed! Username or password is incorrect.');
       }
     } catch (error) {
-      // Handle network or other response errors
       setErrorMessage('An error occurred! Please try again later.');
     } finally {
-      setIsLoading(false); // Always reset loading state
+      setIsLoading(false);
     }
   };
 

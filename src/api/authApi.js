@@ -8,6 +8,7 @@ export const login = async (username, password) => {
       password,
     });
     console.log(response.data);
+    localStorage.setItem("token", response.data.token);
     return response.data;
   } catch (err) {
     console.error("Error logging in:", err);
@@ -90,6 +91,7 @@ export const logout = async () => {
       }
     );
     console.log(response.data);
+    localStorage.removeItem("token");
     return response.data;
   } catch (err) {
     console.error("Error logging out:", err);
