@@ -13,102 +13,87 @@ export default function Mitra() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [verifiedRows, setVerifiedRows] = useState({}); // Track verification status
+  const [verifiedRows, setVerifiedRows] = useState({});
 
-  // Fetch Data from API
   const fetchData = useCallback(async () => {
-    setLoading(true); // Start loading
-    setError(null); // Clear previous errors
-  
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await mockDataMitra();
-  
-      // Log the raw response for debugging
-      console.log('API Response:', response);
-  
-      // Check if the response is valid and contains data
-      if (response && response.status === 200) {
-        const { data } = response; // Destructure the data directly from response
-  
-        if (Array.isArray(data)) {
-          const numberedData = data.map((item, index) => ({
-            ...item,
-            no: index + 1, // Add numbering
-          }));
-          setData(numberedData);
-        } else {
-          console.error("Error: Response data is not an array.");
-          setError("Response data is not an array."); // Handle unexpected data type
-        }
-      } else {
-        console.error(`Error: Received status ${response.status}`);
-        setError(`Received status ${response.status}`); // Handle non-200 responses
-      }
+      const response = await listMitras();
+      const numberedData = response.data.map((item, index) => ({
+        ...item,
+        no: index + 1,
+      }));
+      setData(numberedData);
     } catch (err) {
-      console.error("Error fetching data:", err);
-      setError(err.message || "An unexpected error occurred."); // Set a user-friendly error message
+      setError(err.message || "An unexpected error occurred.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }, []);
+
+  const handleVerification = async (id) => {
+    try {
+      await verifyMitra(id);
+      setVerifiedRows((prev) => ({ ...prev, [id]: true }));
+      fetchData(); // Refresh the data after verification
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+  };
           
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
-    if (!loading) {
-      if ($.fn.dataTable.isDataTable('#Usaha')) {
-        $('#Usaha').DataTable().destroy();
-      }
-
-      $('#Usaha').DataTable({
-        data: data,
-        columns: [
-          { title: "No", data: "no" },
-          { title: "Mitra ID", data: "id" },
-          { title: "Owner Identifier", data: "owner_identifier" },
-          { title: "Name", data: "name" },
-          { title: "Saldo", data: "saldo" },
-          { title: "Latitude", data: "latitude" },
-          { title: "Longitude", data: "longitude" },
-          { title: "Kategori", data: "category" },
-          {
-            title: "Actions",
-            data: null,
-            render: (data, type, row) => {
-              const isVerified = verifiedRows[row.id];
-              return `
-                <button 
-                  class="bg-green-500 text-white px-2 py-1 rounded verifikasi-btn" 
-                  data-id="${row.id}" 
-                  ${isVerified ? 'disabled' : ''}
-                >
-                  Verifikasi
-                </button>
-              `;
-            },
-          },
-        ],
-        paging: true,
-        searching: true,
-        ordering: true,
-        responsive: true,
-        destroy: true,
-      });
-
-      $('#Usaha').on('click', '.verifikasi-button', function () {
-        const rowId = $(this).data('id');
-        setVerifiedRows((prev) => ({ ...prev, [rowId]: true }));
-      });
-
-      $('#Usaha tbody').on('click', '.delete-button', function() {
-        const id = $(this).data('id');
-        setSelectedId(id);
-        setOpenDialog(true);
-      });
+  if (!loading) {
+    // Destroy the previous DataTable instance if it exists
+    if ($.fn.dataTable.isDataTable('#Mitra')) {
+      $('#Mitra').DataTable().destroy();
     }
-  }, [loading, data, verifiedRows]);
+    const table = $('#Usaha').DataTable({
+      data: data,
+      columns: [
+        { title: "No", data: "no" },
+        { title: "Mitra ID", data: "id" },
+        { title: "Owner Identifier", data: "owner_identifier" },
+        { title: "Name", data: "name" },
+        { title: "Saldo", data: "saldo" },
+        { title: "Latitude", data: "latitude" },
+        { title: "Longitude", data: "longitude" },
+        { title: "Kategori", data: "category" },
+        {
+          title: "Actions",
+          data: null,
+          render: function(data, type, row) {
+            return `
+              <button 
+                class="bg-green-500 text-white px-2 py-1 rounded verifikasi-btn" 
+                data-id="${row.id}" 
+                ${verifiedRows[row.id] ? 'disabled' : ''}
+              >
+                Verifikasi
+              </button>
+            `;
+          }
+        }
+      ],
+      destroy: true
+    });
+
+    // Handle verification button click
+    $('#Usaha tbody').on('click', '.verifikasi-btn', function() {
+      const id = $(this).data('id');
+      handleVerification(id);
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }
+}, [loading, data, verifiedRows]);
 
   return (
     <div className="container mx-auto p-4">

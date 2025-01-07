@@ -5,7 +5,7 @@ import {
 } from 'react-icons/hi';
 import { AiOutlineShop } from "react-icons/ai";
 import { RiUserLocationLine } from "react-icons/ri";
-import { TbHelpOctagon } from "react-icons/tb";
+import { IoListSharp } from "react-icons/io5";
 import { useState } from 'react';
 
 export const DASHBOARD_SIDEBAR_LINKS = [
@@ -30,7 +30,7 @@ export const DASHBOARD_USERS = [
 	{
 		key: 'mitra',
 		label: 'Kelola Mitra',
-		path: '/kelolaMitra',
+		path: '/usermitra',
 		icon: <RiUserLocationLine />
 	},
 	{
@@ -46,7 +46,7 @@ export const DASHBOARD_BANTUAN = [
 		key: 'bantuan',
 		label: 'Kelola Kategori',
 		path: '/kelolakategori',
-		icon: <TbHelpOctagon />
+		icon: <IoListSharp />
 	},
 ];
 

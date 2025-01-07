@@ -15,11 +15,10 @@ export const listMitras = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data);
-    return response.data;
+    return response; // Return the entire response object
   } catch (err) {
     console.error("Error fetching data from API:", err);
-    return err;
+    throw err; // Throw the error instead of returning it
   }
 };
 
@@ -32,15 +31,18 @@ export const verifyMitra = async (mitraId) => {
   }
 
   try {
-    const response = await axios.put(API_URL + `/mitras/${mitraId}/status`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response.data);
+    const response = await axios.put(
+      API_URL + `/mitras/${mitraId}/status`,
+      {}, // Empty body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error verifying mitra:", error);
-    return error;
+    throw error;
   }
 };

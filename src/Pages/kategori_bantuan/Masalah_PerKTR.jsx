@@ -35,15 +35,12 @@ export default function KategoriBantuan() {
     setError(null);
     try {
       const response = await listProblems(category);
-      if (response && response.data) {
-        const numberedData = response.data.map((item, index) => ({
-          ...item,
-          no: index + 1,
-        }));
-        setData(numberedData);
-      } else {
-        throw new Error("No data found");
-      }
+      // Remove the response.data check since listProblems now returns the data directly
+      const numberedData = response.map((item, index) => ({
+        ...item,
+        no: index + 1,
+      }));
+      setData(numberedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -56,18 +53,13 @@ export default function KategoriBantuan() {
   }, [fetchCategoryData]);
 
   useEffect(() => {
-    if (!loading && !error) {
-      if ($.fn.dataTable.isDataTable('#Bantuan')) {
-        $('#Bantuan').DataTable().destroy();
-      }
-
-      $('#Bantuan').DataTable({
+    if (!loading && data.length > 0) {
+      const table = $('#Bantuan').DataTable({
         data: data,
         columns: [
           {
             title: "No",
-            data: null,
-            render: (data, type, row, meta) => meta.row + 1,
+            data: "no",
           },
           { title: "Problem ID", data: "id" },
           { title: "Name", data: "name" },
@@ -81,21 +73,21 @@ export default function KategoriBantuan() {
             },
           },
         ],
-        paging: true,
-        searching: true,
-        ordering: true,
-        responsive: true,
         destroy: true,
+        responsive: true,
       });
-
-      $('#Bantuan').on('click', '.delete-btn', function () {
+      $('#Bantuan').off('click', '.delete-btn').on('click', '.delete-btn', function() {
         const rowId = $(this).data('id');
         const selectedData = data.find((item) => item.id === rowId);
         setSelectedRow(selectedData);
-        setIsDeleteModalOpen(true); // Open the delete confirmation modal
+        setIsDeleteModalOpen(true);
       });
+
+      return () => {
+        table.destroy();
+      };
     }
-  }, [loading, data, error]);
+  }, [loading, data]);
 
   const handleDeleteConfirm = async () => {
     if (!selectedRow) return;
@@ -171,7 +163,15 @@ export default function KategoriBantuan() {
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">{`Kelola Masalah ${category.charAt(0).toUpperCase() + category.slice(1)}`}</h2>
 
-      <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} className="mt-4">
+      <Button 
+        variant="contained" 
+        onClick={handleOpenAddModal}
+        sx={{ 
+            backgroundColor: '#6B7280',
+            '&:hover': {
+                backgroundColor: '#4B5563'
+            }
+      }}>
         Tambah Masalah
       </Button>
 

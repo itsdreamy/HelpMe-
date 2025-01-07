@@ -35,7 +35,7 @@ export default function KelolaKategori() {
                     ...item,
                     no: index + 1,
                 }));
-                console.log(numberedData);//setData(numberedData);
+                setData(numberedData); // This line was commented out in your code
             } else {
                 console.error("No data found");
             }
@@ -51,10 +51,11 @@ export default function KelolaKategori() {
     }, [fetchData]);
 
     useEffect(() => {
-        if (!loading && !error) {
+        if (!loading && data.length > 0) {
             initializeDataTable();
         }
-    }, [loading, data, error]);
+    }, [data, loading]);
+    
 
     const initializeDataTable = () => {
         if ($.fn.dataTable.isDataTable('#KelolaBantuan')) {
@@ -149,7 +150,16 @@ export default function KelolaKategori() {
     return (
         <div className="container mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Kelola Kategori Bantuan</h2>
-            <Button variant="contained" color="primary" onClick={handleOpenAddModal} className="mt-4">
+            <Button 
+                variant="contained" 
+                onClick={handleOpenAddModal}
+                sx={{ 
+                    backgroundColor: '#6B7280',
+                    '&:hover': {
+                        backgroundColor: '#4B5563'
+                    }
+                }}
+            >
                 Tambah Kategori
             </Button>
 

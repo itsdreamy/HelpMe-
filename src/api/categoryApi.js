@@ -166,11 +166,11 @@ export const listProblems = async (categoryName) => {
         },
       }
     );
-    console.log(response.data);
+    // Return just the response data instead of wrapping it
     return response.data;
   } catch (err) {
     console.error("Error fetching data from API:", err);
-    return err;
+    throw err; // Throw the error instead of returning it
   }
 };
 

@@ -3,7 +3,7 @@ import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_USAHA, DASHBOARD_USERS, DASHBOARD_BA
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { HiOutlineLogout } from 'react-icons/hi';
-import { TbHelpTriangle } from "react-icons/tb";
+import { TbCategoryPlus } from "react-icons/tb";
 import { listCategory } from "../api/categoryApi";
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { logout } from "../api/authApi";
@@ -21,7 +21,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
   const [collapsedState, setCollapsedState] = useState(isCollapsed);
 
   const categoryIcons = [
-    <TbHelpTriangle />
+    <TbCategoryPlus />
   ];
 
   const fetchCategoryList = async () => {
