@@ -2,11 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { listHelpers } from '../../api/categoryApi';
+import { listCategory, listHelpers, storeHelper, deleteHelper } from '../../api/categoryApi';
 import Preloader from "../../components/Preloader";
 import ReactModal from 'react-modal';
 import { useNavigate, useParams } from 'react-router-dom';
-import { storeProblem, deleteProblem } from '../../api/categoryApi';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Button, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
@@ -25,28 +24,44 @@ export default function KategoriBantuan() {
   const [selectedHelper, setSelectedHelper] = useState('');
   const [name, setName] = useState('');
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
 
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await listCategory();
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
   const fetchHelperData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await listHelpers(category);
-      if (response) {
-        console.log({'HELPER': response.data});
-        setHelperData(response.data);
-      } else {
-        console.error("No helper data found");
-      }
+      // Ensure response is an array before mapping
+      const dataArray = Array.isArray(response.data) ? response.data : [];
+      const numberedData = dataArray.map((item, index) => ({
+        ...item,
+        no: index + 1,
+      }));
+      setData(numberedData);
     } catch (err) {
-      console.error("Error fetching helper data:", err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+}, [category]);
 
   useEffect(() => {
     fetchHelperData();
@@ -66,8 +81,14 @@ export default function KategoriBantuan() {
             data: null,
             render: (data, type, row, meta) => meta.row + 1,
           },
-          { title: "Problem ID", data: "id" },
-          { title: "Name", data: "name" },
+          { 
+            title: "Category ID",
+            data: "category_id" // Make sure this matches your API response field
+          },
+          { 
+            title: "Name",
+            data: "name"
+          },
           {
             title: "Actions",
             data: null,
@@ -85,6 +106,8 @@ export default function KategoriBantuan() {
         destroy: true,
       });
 
+      
+
       $('#Bantuan').on('click', '.delete-btn', function () {
         const rowId = $(this).data('id');
         const selectedData = data.find((item) => item.id === rowId);
@@ -99,20 +122,20 @@ export default function KategoriBantuan() {
 
     setLoading(true);
     try {
-      await deleteProblem(selectedRow.id);
+      await deleteHelper(selectedRow.id);
       setData(data.filter((item) => item.id !== selectedRow.id));
-      setSnackbarMessage('Problem deleted successfully!');
+      setSnackbarMessage('Helper deleted successfully!');
       setSnackbarSeverity('success');
     } catch (err) {
-      console.error("Failed to delete problem:", err);
-      setSnackbarMessage('Failed to delete problem!');
+      console.error("Failed to delete helper:", err);
+      setSnackbarMessage('Failed to delete helper!');
       setSnackbarSeverity('error');
     } finally {
       setLoading(false);
     }
-    setIsDeleteModalOpen(false); // Close the delete modal
-    setSnackbarOpen(true); // Open the Snackbar
-  };
+    setIsDeleteModalOpen(false);
+    setSnackbarOpen(true);
+};
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -133,43 +156,45 @@ export default function KategoriBantuan() {
 
   
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const newData = await storeProblem(name, selectedHelper);
-      if (newData) {
-        console.log(newData);
-        setSnackbarMessage('Entry added successfully!');
-        setSnackbarSeverity('success');
-  
-        // Update the data state
-        setData((prevData) => [...prevData, newData]);
-  
-        // Refresh the DataTable
-        const dataTable = $('#Bantuan').DataTable();
-        dataTable.clear().rows.add([...data, newData]).draw(); // Ensure you use the updated data array
-      } else {
-        throw new Error("No data returned");
-      }
-    } catch (error) {
-      console.error("Failed to add new entry:", error);
-      setSnackbarMessage('Failed to add new entry!');
-      setSnackbarSeverity('error');
-    } finally {
-      setIsAddModalOpen(false); // Ensure modal closes regardless of success or failure
-      setLoading(false);
-      setSnackbarOpen(true); // Open the Snackbar
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const newHelper = await storeHelper(category, name, category); // Using category directly
+    if (newHelper) {
+      setSnackbarMessage('Helper added successfully!');
+      setSnackbarSeverity('success');
+      
+      await fetchHelperData();
+      
+      handleCloseAddModal();
+    } else {
+      throw new Error("No data returned");
     }
-  };
-  
-  
+  } catch (error) {
+    console.error("Failed to add new helper:", error);
+    setSnackbarMessage('Failed to add new helper!');
+    setSnackbarSeverity('error');
+  } finally {
+    setLoading(false);
+    setSnackbarOpen(true);
+  }
+};
+
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">{`Kelola Bantuan ${category.charAt(0).toUpperCase() + category.slice(1)}`}</h2>
 
-      <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} className="mt-4">
-        Tambah Masalah
+      <Button 
+              variant="contained" 
+              onClick={handleOpenAddModal}
+              sx={{ 
+                  backgroundColor: '#6B7280',
+                  '&:hover': {
+                      backgroundColor: '#4B5563'
+                  }
+            }}>
+        Tambah Bantuan
       </Button>
 
       {loading ? (
@@ -182,7 +207,7 @@ export default function KategoriBantuan() {
             <thead className="bg-gray-200">
               <tr>
                 <th>No</th>
-                <th>Problem ID</th>
+                <th>Category ID</th>
                 <th>Name</th>
                 <th>Actions</th>
               </tr>
@@ -222,39 +247,34 @@ export default function KategoriBantuan() {
 
       {/* Modal Dialog for adding new entry */}
       <Dialog open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-        <DialogTitle>Add New Problem</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Name"
-            fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            select
-            label="Helper"
-            fullWidth
-            value={selectedHelper}
-            onChange={(e) => setSelectedHelper(e.target.value)}
-            margin="normal"
-          >
-            {helperData.map((helper) => (
-              <MenuItem key={helper.id} value={helper.id}>
-                {helper.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsAddModalOpen(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogTitle>Add New Problem</DialogTitle>
+      <DialogContent>
+        <TextField
+          label="Name"
+          fullWidth
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          margin="normal"
+        />
+        <TextField
+          label="Category"
+          fullWidth
+          value={category}
+          margin="normal"
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setIsAddModalOpen(false)} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} color="primary">
+          Add
+        </Button>
+      </DialogActions>
+    </Dialog>
 
       {/* Snackbar for notifications */}
       <Snackbar

@@ -27,27 +27,22 @@ export const storeCategory = async (name) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    console.log("No token found");
-    return null;
+    throw new Error("No token found");
   }
 
-  try {
-    const response = await axios.post(
-      `${API_URL}/categories`,
-      { name },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(response.data);
-    return response.data;
-  } catch (err) {
-    console.error("Error fetching data from API:", err);
-    return err;
-  }
+  const response = await axios.post(
+    `${API_URL}/categories`,
+    { name },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
 };
+
 
 export const deleteCategory = async (categoryId) => {
   const token = localStorage.getItem("token");
@@ -96,7 +91,7 @@ export const listHelpers = async (categoryName) => {
   }
 };
 
-export const storeHelper = async (categoryName, name) => {
+export const storeHelper = async (categoryName, name, category_id) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -108,6 +103,7 @@ export const storeHelper = async (categoryName, name) => {
     const response = await axios.post(
       `${API_URL}/categories/helpers?category=${categoryName}`,
       {
+        category_id,
         name,
       },
       {
@@ -123,6 +119,7 @@ export const storeHelper = async (categoryName, name) => {
     return err;
   }
 };
+
 
 export const deleteHelper = async (helperId) => {
   const token = localStorage.getItem("token");

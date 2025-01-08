@@ -61,19 +61,31 @@ export default function KelolaKategori() {
         if ($.fn.dataTable.isDataTable('#KelolaBantuan')) {
             $('#KelolaBantuan').DataTable().destroy();
         }
-
+    
         $('#KelolaBantuan').DataTable({
             data: data,
             columns: [
-                { title: "No", data: "no" },
-                { title: "Kategori ID", data: "id" },
-                { title: "Nama", data: "name" },
+                { 
+                    title: "No", 
+                    data: null,
+                    render: (data, type, row, meta) => meta.row + 1 
+                },
+                { 
+                    title: "Kategori ID", 
+                    data: "id",
+                    render: (data, type, row) => row.id || '-'
+                },
+                { 
+                    title: "Nama", 
+                    data: "name",
+                    render: (data, type, row) => row.name || '-'
+                },
                 {
                     title: "Actions",
                     data: null,
                     render: (data, type, row) => {
                         return `
-                            <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${row.id}">Delete</button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${row.id || ''}">Delete</button>
                         `;
                     },
                 },
@@ -84,7 +96,6 @@ export default function KelolaKategori() {
             responsive: true,
             destroy: true,
         });
-
         $('#KelolaBantuan').on('click', '.delete-btn', function () {
             const rowId = $(this).data('id');
             const selectedData = data.find((item) => item.id === rowId);
@@ -131,21 +142,36 @@ export default function KelolaKategori() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        handleCloseAddModal();
-        // Implement your add logic here (API call)
+        setLoading(true);
+        
         try {
-            const newCategory = await storeCategory(newCategoryName); // Replace with your add function
-            setData([...data, { id: newCategory.id, name: newCategoryName, no: data.length + 1 }]); // Add new category to state
+            const newCategory = await storeCategory(newCategoryName);
+            
+            // Update the data state with the new category
+            setData(prevData => [...prevData, {
+                id: newCategory.id,
+                name: newCategory.name,
+                no: prevData.length + 1
+            }]);
+    
+            // Show success message
             setSnackbarMessage('Category added successfully!');
             setSnackbarSeverity('success');
+            
+            // Close modal and reset form
+            handleCloseAddModal();
+            
+            // Reinitialize DataTable
+            initializeDataTable();
+            
         } catch (error) {
-            console.error("Failed to add new category:", error);
-            setSnackbarMessage('Failed to add new category!');
+            setSnackbarMessage('Failed to add category: ' + error.message);
             setSnackbarSeverity('error');
         } finally {
+            setLoading(false);
             setSnackbarOpen(true);
         }
-    };
+    };   
 
     return (
         <div className="container mx-auto p-4">
